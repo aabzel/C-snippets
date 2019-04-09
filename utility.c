@@ -240,8 +240,35 @@ int my_memcmp(const unsigned char *inArray1,
 
 
 
+struct Node_t {
+    int data;
+    struct Node_t *nextNode;
+};// 8 byte
 
-
+// Find previous node of single linked list based on full RAM review.
+int find_prev_node (struct Node_t *curNode, //in
+                    struct Node_t **prevNode, // out
+                    int *prevNodeCnt) // out 
+{
+  struct Node_t *runNode = NULL;
+  *prevNode = NULL;
+  *prevNodeCnt = 0;
+  int sizeofNode = sizeof(struct Node_t );
+  for (int addr = FIRST_SRAM_ADDR; addr <= LAST_SRAM_ADDR-sizeofNode; addr++){
+      runNode = ( struct Node_t*) addr;
+      if(runNode->nextNode == curNode){
+	  *prevNode = runNode;
+          *prevNodeCnt++;
+      }
+  }
+  if ( 1<*prevNodeCnt ) {
+      return 2; // error several prev nodes
+  }else if (1==*prevNodeCnt ){
+      return 0; // success
+  }else{
+      return 1; // error lack of prev nodes
+  }
+}
 
 
 
