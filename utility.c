@@ -271,4 +271,73 @@ int find_prev_node (struct Node_t *curNode, //in
 }
 
 
+/* return 0 if character contains only hex digit , else return 1*/
+int is_hex_digit (const char character) {
+    if (('A' <= character && character <= 'F') || \
+        ('a' <= character && character <= 'f') || \
+        ('0' <= character && character <= '9')) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+
+//0 - is a hex str
+//<0 not a hex str
+int is_raw_hex_string (char const * const inByteStr, int const lenOfStr) {
+    int lenRead;
+    if (!inByteStr) {
+    	return 1;
+    }
+    if(!lenOfStr){
+    	return 2;
+    }
+    lenRead = strlen(inByteStr);
+    if ( lenRead != lenOfStr ) {
+        return 3;
+    }
+    for (int i=0; i<lenOfStr; i++) {
+        if ( is_hex_digit (inByteStr[i]) ) {
+            return i+4;
+        }
+    }
+    return 0;
+}
+
+
+//convert string with hex values to byte array in C
+int hex_str_to_bin_array (const char * const inStrWithHex, int const inLenOfhexStr,
+		                  uint8_t * const outBinStr, int const inSizeOfBinStr) {
+	int ret;
+	if(!inSizeOfBinStr || !inLenOfhexStr){
+	    return 1;
+	}
+
+	if (inLenOfhexStr != (inSizeOfBinStr*2)) {
+	    return 2;
+	}
+
+	if(!inStrWithHex  || !outBinStr){
+		return 3;
+	}
+	ret = is_raw_hex_string (inStrWithHex, inLenOfhexStr);
+	if (ret ){
+		return 4;
+	}
+	for (int i=0; i<inSizeOfBinStr; i++) {
+		int byteVal=0;
+		int ret=-1;
+		char strWhithHexByte[3] ={inStrWithHex[2*i],inStrWithHex[2*i+1],'\0'};
+		ret = sscanf(strWhithHexByte,"%02x", &byteVal);
+		if (1!=ret ) {
+			return i+5;
+		}
+		outBinStr[i] = (uint8_t)  (0x000000FF & byteVal);
+	}
+
+	return 0;
+}
+
+
 
