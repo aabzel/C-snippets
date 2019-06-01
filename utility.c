@@ -57,6 +57,30 @@ uint32_t pack_ipv4 (const uint8_t ipAddrByte1, const uint8_t ipAddrByte2,
     return ipv4bytesBe;
 }
 
+/*
+ * outArray 1.1.1.1(7byte)....... 255.255.255.255 (15byte)
+ * 7<*outArrayLen<15   
+ * */
+int unpack_ipv4 ( uint32_t ipAddr, char *outArray, int *outArrayLen)
+{
+    unsigned char *ipAddrBytes;
+    char ipTempAddrArray[20] = {0};
+    ipAddrBytes = (unsigned char *) &ipAddr;
+    sprintf(ipTempAddrArray,"%d.%d.%d.%d", (int)ipAddrBytes[0], 
+                                       (int)ipAddrBytes[1],
+                                       (int)ipAddrBytes[2], 
+                                       (int)ipAddrBytes[3]);
+    int len = strlen(ipTempAddrArray);
+    
+    if ((7<=len) && (len<=15)) {
+        strcpy(outArray, ipTempAddrArray);
+        *outArrayLen = len;
+    } else {
+        return 1;
+    }
+    return 0;
+}
+
 int mac_bin_to_str (unsigned char *macBinIn, char *macStrOut, int sizeOfMacStr)
 {
     if (macBinIn == NULL) {
