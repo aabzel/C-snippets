@@ -161,10 +161,9 @@ int is_hex_digit (const char character) {
 }
 
 
-
 /* return 0 if IP string is valid,
  * return positive number if error */
-int is_valid_ip (char *inIpStr)
+int is_valid_ip (char *inIpStr, unsigned char *outOctets)
 {
 	//printf("\n is_valid_ip...\n");
 	//printf("\n inIpStr: %s \n", inIpStr);
@@ -179,8 +178,8 @@ int is_valid_ip (char *inIpStr)
 	int lenOfStr = strlen(inIpStr);
 	//printf("\n lenOfStr: %d \n", lenOfStr);
 
-
-	for (int j = 0; j < lenOfStr+1; j++) {
+    int j = 0;
+	for (j = 0; j < lenOfStr+1; j++) {
 
 		char curChar = inIpStr[j];
 		//printf("\n curChar: %c        \n", curChar);
@@ -211,6 +210,10 @@ int is_valid_ip (char *inIpStr)
 	//printf("\n dotCnt: %d \n", dotCnt);
 	if ( dotCnt != 3 )
 		return 5;
+	outOctets[0]=(unsigned char) valOct[0];  
+	outOctets[1]=(unsigned char) valOct[1];  
+	outOctets[2]=(unsigned char) valOct[2];  
+	outOctets[3]=(unsigned char) valOct[3];  
 	return 0;
 }
 
