@@ -201,19 +201,6 @@ int mac_bin_to_str (unsigned char *macBinIn, char *macStrOut, int sizeOfMacStr)
 }
 
 
-/* 0 - array if digit */
-int digits_only (const char *s)
-{
-    while (*s) {
-        if (valid_digit(*s++) != 0) {
-        	return 1;
-        }
-    }
-
-    return 0;
-}
-
-
 void uint16_to_str (const uint16_t inValue, char *outStr)
 {
     if (outStr) {
@@ -237,15 +224,7 @@ void print_array (const unsigned char* inArray,
 }
 
 
-/* return 0 if character contains only digit , else return 1*/
-int valid_digit (const char character)
-{
-    if (('0' <= character)  && (character <= '9')) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
+
 
 
 /* return 0 if character contains only hex digit , else return 1*/
@@ -464,6 +443,149 @@ int hex_str_to_bin_array (const char * const inStrWithHex, int const inLenOfhexS
 
 	return 0;
 }
+
+/* true - array if digit
+ * TODO: add unit test for it
+ * */
+bool is_digit_str (const char  str[]) {
+    bool res = true;
+    uint32_t index = 0u;
+    while ( ((uint8_t) 0x00u) != ((uint8_t) str[index])) {
+        if (false == is_valid_digit (str[index])) {
+            res = false;
+        }
+        index++;
+    }
+
+    return res;
+}
+
+ 
+bool is_valid_digit (const char character) {
+    bool res = false;
+    if (('0' <= character) && (character <= '9')) {
+        res = true;
+    }
+    return res;
+}
+
+char *uint32_to_bin_str (uint32_t const inVal32bit) {
+    static char outBitStr [33] = "";
+    int8_t rBit = 0;
+    uint8_t cell = 0u;
+    uint32_t mask = 0u;
+    for (rBit = 31; 0 <= rBit; rBit--) {
+        cell = (((uint8_t) 31u) - ((uint8_t) rBit));
+        if (cell < sizeof(outBitStr)) {
+            mask = (uint32_t) (((uint32_t) 1u) << ((uint32_t) rBit));
+            if (0u != (inVal32bit & mask)) {
+                outBitStr [cell] = '1';
+            } else {
+                outBitStr [cell] = '0';
+            }
+        }
+    }
+    return outBitStr;
+}
+
+
+/*
+ return 0 if value contains only 1 bit set
+ 1, 2 4 8 16 32 64 128 512 ....
+ */
+uint32_t is_power_of_two (uint32_t const val) {
+    uint32_t outRetPt = (uint32_t) NOT_ONE_BIT_IN_MASK;
+    /*check power of two*/
+    if (0u == (val & (val - 1u))) {
+        /*only one bit set in the value */
+        outRetPt = (uint32_t) ONE_BIT_IN_MASK;
+    }
+    if (0u == val) {
+        outRetPt = (uint32_t) NOT_ONE_BIT_IN_MASK;
+    }
+    return outRetPt;
+}
+
+
+/*
+ return 0 if value contains only 1 bit set
+ 1, 2 4 8 16 32 64 128 512 ....
+ */
+uint32_t is_one_bit_in_mask (uint32_t const randMask) {
+    uint8_t oneCnt = 0u;
+    uint16_t curBit = 0u;
+    uint32_t outRetM = (uint32_t) NOT_ONE_BIT_IN_MASK;
+    uint32_t tempMask = 0u;
+    uint8_t amntOfBits = 8u * sizeof(uint32_t);
+    /*TODO detach in separate Counting Bits function*/
+    for (curBit = 0u; curBit < amntOfBits; curBit++) {
+        tempMask = (uint32_t) (((uint32_t) 1u << (curBit)));
+        if (0u < (randMask & tempMask)) {
+            /*TODO: reset spot set bit in randMask and check if newVal is 0*/
+            /*maybe next iterations are senseless*/
+            oneCnt++;
+        }
+    }
+    if (1u == oneCnt) {
+        outRetM = (uint32_t) ONE_BIT_IN_MASK;
+    }
+
+    return outRetM;
+}
+
+
+/*
+ *  Odd (Amount of 1 bits is 1 3 5 7 9 and so 31)
+ *  even (Amount of 1 bits is 2 4 6 8 10 and so 32)
+ *
+ *  returns 1 if the parity in inValue is Odd
+ *  (Amount of 1 bits is 1 3 5 7 9 and so 31)
+ *
+ *  inVal  bit         setBit parity
+ *  1     > 01       > 1 >    PARITY_ODD
+ *  2     > 10       > 1 >    PARITY_ODD
+ *  3     > 11       > 2 >    PARITY_EVEN
+ *  178   > 10110010 > 4 >    PARITY_EVEN
+ */
+uint8_t is_parity_odd (uint32_t const inVal) {
+    uint8_t otRet = (uint8_t) PARITY_UNDEF;
+    uint8_t cntOnes = 0u;
+    /*count set bits*/
+    cntOnes = count_set_bits (inVal);
+    if (0u < (cntOnes & 1u)) {
+        otRet = (uint8_t) PARITY_ODD; /*(Amount of 1 bits is 1 3 5 7 9 and so 31)*/
+    } else {
+        otRet = (uint8_t) PARITY_EVEN; /*(Amount of 1 bits is 2 4 6 8 10 and so 32)*/
+    }
+
+    return otRet;
+}
+
+
+
+/*
+ * Function returns the number of set bits in binary
+ * representation of positive integer val
+ * TODO: we can boost time of calculation by creating look up table for byte->am of bit
+ *       It will reqire 512 byte of flash for 8bit value.
+ *
+ * */
+uint8_t count_set_bits (uint32_t const inVal32bit) {
+    uint8_t count = 0u;
+    int8_t runBit = 0;
+    uint32_t val32bit = inVal32bit;
+    for (runBit = 31; 0 <= runBit; runBit--) {
+        if (0u != (val32bit & (((uint32_t) 1u) << ((uint32_t) runBit)))) {
+            count++;
+            val32bit &= (uint32_t) (~((((uint32_t) 1u) << ((uint32_t) runBit))));
+            if (0u == val32bit) {
+                break;
+            }
+        }
+    }
+    return count;
+}
+
 
 
 
