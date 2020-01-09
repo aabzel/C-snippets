@@ -586,6 +586,22 @@ uint8_t count_set_bits (uint32_t const inVal32bit) {
     return count;
 }
 
+/*
+ * input:  C:/Job/IO_V4/1_FW/components/lib/spc58_gpio/src/gpio.c
+ * return: gpio.c
+ *
+ * */
+char *file_name_from_path (char  * const fullPath) {
+    char * pFileNeme = NULL;
+    pFileNeme = strrchr (fullPath, (int32_t) '/');
+    if (NULL != pFileNeme) {
+        pFileNeme = strrchr (fullPath, (int32_t) '/');
+        pFileNeme++;
+    } else {
+        pFileNeme = fullPath;
+    }
 
+    return pFileNeme;
+}
 
 
