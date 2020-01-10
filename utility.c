@@ -656,3 +656,21 @@ uint32_t is_big_endian (void) {
     }
     return result;
 }
+
+bool test_stack_dirr (void) {
+    uint8_t prevAddr [100] = "some_data_in_stack_ram1";
+    bool res = 0;
+    res = is_stack_addr_decreases (prevAddr);
+
+    return res;
+}
+
+bool is_stack_addr_decreases (uint8_t * const val) {
+    uint8_t inVal [100] = "some_data_in_stack_ram2";
+    if (inVal < val) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
