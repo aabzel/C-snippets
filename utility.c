@@ -644,3 +644,15 @@ bool extract_byte (uint32_t const inValue, uint8_t const inByte, uint8_t * const
     return res;
 }
 
+uint32_t is_big_endian (void) {
+    uint32_t result = 3u;
+    uint16_t x = 0x0001u;
+    uint8_t *ch;
+    ch = (uint8_t *) &x;
+    if (0x00u == (*ch)) {
+        result = 1u; /*"big-endian"*/
+    } else {
+        result = 0u; /*"little-endian"*/
+    }
+    return result;
+}
