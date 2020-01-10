@@ -604,4 +604,19 @@ char *file_name_from_path (char  * const fullPath) {
     return pFileNeme;
 }
 
+uint32_t calc_sum_of_bytes (uint8_t const inArray [], uint32_t const lenOfArray) {
+    uint32_t sum = 0u;
+    uint32_t i = 0u;
 
+    if (NULL == inArray) {
+        sum = 0xFFFFFFFFu;
+    }
+
+    if (0u == sum) {
+        for (i = 0u; i < lenOfArray; i++) {
+            sum += (uint32_t) inArray [i];
+        }
+    }
+
+    return sum;
+}
