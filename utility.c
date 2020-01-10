@@ -620,3 +620,27 @@ uint32_t calc_sum_of_bytes (uint8_t const inArray [], uint32_t const lenOfArray)
 
     return sum;
 }
+
+
+bool extract_byte (uint32_t const inValue, uint8_t const inByte, uint8_t * const outByte) {
+    uint32_t value = inValue;
+    uint8_t byte = 0u;
+    uint8_t bitShift = inByte * 8u;
+    bool res = true;
+    if (3u < inByte) {
+        res = false;
+    }
+
+    if (true == res) {
+        if (NULL == outByte) {
+            res = false;
+        }
+    }
+    if (true == res) {
+        byte = (uint8_t) ((value >> bitShift) & 0x000000FFu);
+        *outByte = byte;
+    }
+
+    return res;
+}
+
