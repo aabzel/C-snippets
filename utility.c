@@ -535,6 +535,32 @@ uint32_t is_one_bit_in_mask (uint32_t const randMask) {
 
 
 /*
+ Find the first occurrence of pattern in text, ignore case.
+ time complexity O(T*P)*/
+const char *str_case_str (const char * const text, const char * const pattern) {
+    const char *retPtr = NULL;
+    if ((NULL != text) && (NULL != pattern)) {
+        if (pattern [0] == '\0') {
+            retPtr = &text [0];
+        } else {
+            int i;
+            for (i = 0; text [i] != '\0'; ++i) {
+                int j = 0;
+                while ((text [i + j] != '\0') && ((tolower ((int) text [i + j]) == tolower ((int) pattern [j])))) {
+                    ++j;
+                }
+                if (pattern [j] == '\0') {
+                    retPtr = &text [i];
+                    break;
+                }
+            }
+        }
+    }
+
+    return retPtr;
+}
+
+/*
  *  Odd (Amount of 1 bits is 1 3 5 7 9 and so 31)
  *  even (Amount of 1 bits is 2 4 6 8 10 and so 32)
  *
@@ -664,6 +690,43 @@ bool test_stack_dirr (void) {
 
     return res;
 }
+
+/*inOutStr must be in RAM not in ROM(FLASH)*/
+/* exapmle - EXAPMLE*/
+bool str2uppercase (char * const inOutStr) {
+    bool res = false;
+    if (NULL != inOutStr) {
+        uint32_t index;
+        uint32_t strLen = strlen (inOutStr);
+        for (index = 0; index < strLen; index++) {
+            if (('a' <= inOutStr [index]) && (inOutStr [index] <= 'z')) {
+                inOutStr [index] = inOutStr [index] - 32u;
+            }
+        }
+        res = true;
+    }
+    return res;
+}
+
+bool  toLowerCase (char *  inOutStr) {
+    bool res = false;
+    if (NULL != inOutStr) {
+        uint32_t index;
+        uint32_t strLen = strlen (inOutStr);
+        for (index = 0; index < strLen; index++) {
+            if (('A' <= inOutStr [index]) && (inOutStr [index] <= 'Z')) {
+                inOutStr [index] = inOutStr [index] + 32u;
+            }
+        }
+        res = true;
+    }
+    return res;
+}
+
+
+
+
+
 
 bool is_stack_addr_decreases (uint8_t * const val) {
     uint8_t inVal [100] = "some_data_in_stack_ram2";
