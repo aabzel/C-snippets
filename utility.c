@@ -1,5 +1,33 @@
 // C programming language handy functions
 
+
+int strStr ( char *  text,  char *  pattern) {
+    int ret=-1, i=0;
+    const char *retPtr = NULL;
+    if ((NULL != text) && (NULL != pattern)) {
+        if (pattern [0] == '\0') {
+            retPtr = &text [0];
+            ret=0;
+        } else {
+            for (i = 0; text [i] != '\0'; ++i) {
+                int j = 0;
+                while ((text [i + j] != '\0') && (( ((int) text [i + j]) ==  ((int) pattern [j])))) {
+                    ++j;
+                }
+                if (pattern [j] == '\0') {
+                    retPtr = &text [i];
+                    ret=i;
+                    break;
+                }else{
+                    ret=-1;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 time_t convertDateToUnixTime (RTC_TimeTypeDef const inTime,
                               RTC_DateTypeDef const inDate) {
     uint32_t y, m, d, t;
