@@ -34,6 +34,46 @@ void print_permut (int *in_current_array, int in_curr_arr_size, int pos, int *al
     }
 }
 
+
+void assemble_from_alph (int *in_remain_alphabet, int size_of_alphabet, int *in_cur_arr, int in_cur_arrSize) {
+    if ((0 == size_of_alphabet) && (NULL == in_remain_alphabet)) {
+        if ((NULL != in_cur_arr) && (0 < in_cur_arrSize)) {
+            print_array_int (in_cur_arr, in_cur_arrSize);
+            free (in_cur_arr);
+        }
+        return;
+    } else if ((0 < size_of_alphabet) && (NULL != in_remain_alphabet)) {
+        for (int num_order = 0; num_order < size_of_alphabet; num_order++) {
+            int *new_remain_alphabet = memdup (in_remain_alphabet, sizeof (int) * size_of_alphabet);
+            if (NULL == new_remain_alphabet) {
+                printf ("\n Unable to duplicate in alphabet %u ", num_order);
+                return;
+            }
+
+            int *cur_array_extended = add_val_to_end_array (in_cur_arr, in_cur_arrSize, new_remain_alphabet[num_order]);
+            free (in_cur_arr);
+            if (NULL != cur_array_extended) {
+                // part of the solution allocated
+                int *redused_alphabet = remove_int_from_arr (new_remain_alphabet, size_of_alphabet, num_order);
+
+                if (NULL != redused_alphabet) {
+                    assemble_from_alph (redused_alphabet, (size_of_alphabet - 1), cur_array_extended,
+                                        in_cur_arrSize + 1);
+                } else {
+                    assemble_from_alph (NULL, 0, cur_array_extended, in_cur_arrSize + 1);
+
+                }
+            }
+            if (new_remain_alphabet) {
+                free (new_remain_alphabet);
+            }
+        }
+        free (in_remain_alphabet);
+    }
+}
+
+
+
 void permute_from_set (int total_num, int *alf, int alf_size) {
     printf ("\n");
     print_permut (NULL, 0, 0, alf, alf_size, total_num);
