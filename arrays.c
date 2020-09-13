@@ -215,7 +215,7 @@ void *memdup (const void *mem, size_t sizeByte) {
         if (NULL != mem) {
             out = (void *)malloc (sizeByte);
             if (NULL != out) {
-                memcpy (out, mem, sizeByte);
+                memcpy ((void *)out, (void *)mem, sizeByte);
             } else {
                 printf ("\n Unable to malloc [%u] byte\n", (unsigned int)sizeByte);
             }
@@ -228,6 +228,7 @@ void *memdup (const void *mem, size_t sizeByte) {
     return out;
 }
 
+//
 int *add_val_to_end_array (int *inArr, int arrSize, int val) {
     int *newArr = NULL;
 #if DEBUG_ADD_VAL_TO_END_ARRAY
@@ -243,7 +244,7 @@ int *add_val_to_end_array (int *inArr, int arrSize, int val) {
                 printf ("\n");
 #endif
                 memcpy (newArr, inArr, sizeof (int) * (arrSize));
-                //must not be freed
+                // inArr must not be free here
             }
         }
         newArr[arrSize] = val;
@@ -264,30 +265,32 @@ int *add_val_to_end_array (int *inArr, int arrSize, int val) {
     return newArr;
 }
 //[inArr 1 0]
+//[inArr 2 1]
+// {11 22} 2 1
 int *remove_int_from_arr (int *inArr, int arrSize, int delIndex) {
+#ifdef DEBUG_REMOVE_INT_FROM_ARR
+    printf ("\n %s size: %u delInd %u", __FUNCTION__, arrSize, delIndex);
+#endif
     int *newArr = NULL;
-    if (inArr) {
+    if (NULL != inArr) {
         if (delIndex < arrSize) {
             if (2 <= arrSize) {
-                newArr = malloc (sizeof (int) * arrSize);
-                if (newArr) {
-                    memcpy (newArr, inArr, sizeof (int) * arrSize);
-                    int index = 0;
-                    for (index = delIndex; index < (arrSize - 1); index++) {
-                        newArr[index] = newArr[index + 1];
-                    }
+                int index = 0;
+                for (index = delIndex; index < (arrSize - 1); index++) {
+                    inArr[index] = inArr[index + 1];
                 }
+                inArr[arrSize] = 0;
+                newArr = inArr;
             } else if (1 == arrSize) {
                 newArr = NULL;
             } else {
-                printf ("%s", __FUNCTION__);
+                printf ("%s in Array 0 size", __FUNCTION__);
             }
         } else {
             printf ("arrSize: %d delIndex: %d", arrSize, delIndex);
         }
-        if (0 < arrSize) {
-            free (inArr);
-        }
+    } else {
+        printf ("\n In array NULL");
     }
     return newArr;
 }
@@ -342,9 +345,10 @@ void print_curr_array (int *array, int num) {
 }
 
 void print_array_of_arrays (int **arrOfArr, int amountOfLine, int amountOfCol) {
-    if (arrOfArr) {
+    if (NULL != arrOfArr) {
+        printf ("\n amountOfLine %d \n", amountOfLine);
         for (int line = 0; line < amountOfLine; line++) {
-            print_curr_array (arrOfArr[line], amountOfCol);
+            print_array_int ((int *)arrOfArr[line], amountOfCol);
         }
     }
 }
