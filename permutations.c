@@ -35,45 +35,6 @@ void print_permut (int *in_current_array, int in_curr_arr_size, int pos, int *al
 }
 
 
-void assemble_from_alph (int *in_remain_alphabet, int size_of_alphabet, int *in_cur_arr, int in_cur_arrSize) {
-    if ((0 == size_of_alphabet) && (NULL == in_remain_alphabet)) {
-        if ((NULL != in_cur_arr) && (0 < in_cur_arrSize)) {
-            print_array_int (in_cur_arr, in_cur_arrSize);
-            free (in_cur_arr);
-        }
-        return;
-    } else if ((0 < size_of_alphabet) && (NULL != in_remain_alphabet)) {
-        for (int num_order = 0; num_order < size_of_alphabet; num_order++) {
-            int *new_remain_alphabet = memdup (in_remain_alphabet, sizeof (int) * size_of_alphabet);
-            if (NULL == new_remain_alphabet) {
-                printf ("\n Unable to duplicate in alphabet %u ", num_order);
-                return;
-            }
-
-            int *cur_array_extended = add_val_to_end_array (in_cur_arr, in_cur_arrSize, new_remain_alphabet[num_order]);
-            free (in_cur_arr);
-            if (NULL != cur_array_extended) {
-                // part of the solution allocated
-                int *redused_alphabet = remove_int_from_arr (new_remain_alphabet, size_of_alphabet, num_order);
-
-                if (NULL != redused_alphabet) {
-                    assemble_from_alph (redused_alphabet, (size_of_alphabet - 1), cur_array_extended,
-                                        in_cur_arrSize + 1);
-                } else {
-                    assemble_from_alph (NULL, 0, cur_array_extended, in_cur_arrSize + 1);
-
-                }
-            }
-            if (new_remain_alphabet) {
-                free (new_remain_alphabet);
-            }
-        }
-        free (in_remain_alphabet);
-    }
-}
-
-
-
 void permute_from_set (int total_num, int *alf, int alf_size) {
     printf ("\n");
     print_permut (NULL, 0, 0, alf, alf_size, total_num);
@@ -277,16 +238,6 @@ void permute_ll (char *string, int left, int right) {
     }
 }
 
-void permute (char *string) {
-    int len = strlen (string);
-    if (1 == len) {
-        // printf ("%s\n", string);
-    } else {
-        if (1 < len) {
-            permute_ll (string, 0, len - 1);
-        }
-    }
-}
 
 void permutation (int n) {
     if (0 < n) {
@@ -299,56 +250,7 @@ void permutation (int n) {
     }
 }
 
-/*
- * inAlphabet array of elements to get values for the combinations
- * sizeOfAlphabet size of that array
- * k - amount of letters in result combination instance
- *
- * */
-/* k - amount of letters*/
 
-void assemble_from_alph (int *inAlphabet, int sizeOfAlphabet, int k, int *curArr, int curArrSize) {
-    if (0 == k) {
-#if DEBUG_ASSEMBLE
-        print_array_to_filename (kitFile, curArr, curArrSize);
-        print_curr_array (curArr, curArrSize);
-#endif
-        // linked_list_add_array (&permutllHead, curArr, curArrSize);
-    }
-    if (0 < k) {
-        if (0 < sizeOfAlphabet) {
-#if DEBUG_ASSEMBLE
-            print_array (inAlphabet, sizeOfAlphabet, k);
-#endif
-            int *localAlphabet = malloc (sizeof (int) * sizeOfAlphabet);
-            if (NULL == localAlphabet) {
-                printf ("malloc for in alphabet error");
-                return;
-            }
-            for (int numOrger = 0; numOrger < sizeOfAlphabet; numOrger++) {
-                memcpy (localAlphabet, inAlphabet, sizeof (int) * sizeOfAlphabet);
-                // printf ("\nw[%d]=%d", 2 - k, localAlphabet [numOrger]);
-                int *currArray = add_val_to_end_array (curArr, curArrSize, localAlphabet[numOrger]);
-                if (NULL != currArray) {
-                    int *redusedAlphabet = NULL;
-                    redusedAlphabet = remove_int_from_arr (localAlphabet, sizeOfAlphabet, numOrger);
-                    if (redusedAlphabet) {
-                        assemble_from_alph (redusedAlphabet, (sizeOfAlphabet - 1), (k - 1), currArray, curArrSize + 1);
-                        free (redusedAlphabet);
-                        free (currArray);
-                    } else {
-                        printf ("malloc for reduced alphabet error");
-                        return;
-                    }
-                }
-            }
-#if DEBUG_COMBINE
-            printf ("\n");
-#endif
-            free (localAlphabet);
-        }
-    }
-}
 
 #define DEBUG_IS_PERMUTATED 0
 bool is_permutation (int *arr1, int *arr2, int sizeOfArr) {
@@ -418,18 +320,115 @@ bool is_permutated_element_in_list (list_node_t *pHead, int *inArr, int arrSize)
     }
     return res;
 }
-#endif
-/**
- * Return an array of arrays of size *returnSize.
- * The sizes of the arrays are returned as *returnColumnSizes array.
- * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
- */
 
-int **permute_array (int *array, int numsSize, int *returnSize, int **returnColumnSizes) {
-    int **arrayOfPtr;
-    // clean list permutllHead
-    assemble_from_alph (array, numsSize, numsSize, NULL, 0);
-    // save_list_to_file (permutllHead, pemutationFile);
-    // arrayOfPtr = list_of_arr_to_arr_of_arr (permutllHead, returnSize, returnColumnSizes);
-    return arrayOfPtr;
+#endif
+
+
+void assemble_from_alph (int *in_remain_alphabet, int size_of_alphabet, int *in_cur_arr, int in_cur_arrSize,
+                         int **solution_array) {
+#ifdef DEBUG_PERMUT
+    printf ("\n[d] %s(): line %u alphSize: %d\n", __FUNCTION__, __LINE__, size_of_alphabet);
+#endif
+    static int sol_cnt = 0;
+    if (NULL == in_cur_arr) {
+        sol_cnt = 0;
+    }
+    if ((0 == size_of_alphabet) && (NULL == in_remain_alphabet)) {
+#ifdef DEBUG_PERMUT
+        print_array_to_filename (kitFile, in_cur_arr, in_cur_arrSize);
+#endif
+        if ((NULL != in_cur_arr) && (0 < in_cur_arrSize)) {
+            *(solution_array + sol_cnt) = in_cur_arr;
+            sol_cnt++;
+#ifdef DEBUG_PERMUT
+            printf ("\n[+] solution: %d ", sol_cnt);
+            print_array_int (in_cur_arr, in_cur_arrSize);
+            // free outside
+#endif
+        }
+    } else if ((0 < size_of_alphabet) && (NULL != in_remain_alphabet)) {
+#ifdef DEBUG_PERMUT
+        printf ("\n\n[d] in_remain_alphabet: ");
+        print_array_int (in_remain_alphabet, size_of_alphabet);
+        printf ("\n[d] in_cur_arr: ");
+        print_array_int (in_cur_arr, in_cur_arrSize);
+#endif
+        for (int num_order = 0; num_order < size_of_alphabet; num_order++) {
+            int *new_remain_alphabet = (int *)memdup ((void *)in_remain_alphabet, sizeof (int) * size_of_alphabet);
+            if (NULL == new_remain_alphabet) {
+                printf ("\n Unable to duplicate in alphabet %u ", num_order);
+                return;
+            }
+            int cmp_res = memcmp (new_remain_alphabet, in_remain_alphabet, sizeof (int) * size_of_alphabet);
+            if (0 != cmp_res) {
+                printf ("\n[!] mem duplicate error");
+                return;
+            }
+#ifdef DEBUG_PERMUT
+            printf ("\n[d]    in_remain_alphabet: ");
+            print_array_int (in_remain_alphabet, size_of_alphabet);
+            printf ("\n[d]    new_remain_alphabet: ");
+            print_array_int (new_remain_alphabet, size_of_alphabet);
+#endif
+            int add_val = new_remain_alphabet[num_order];
+#ifdef DEBUG_PERMUT
+            printf ("\n[d]    add_val %d\n ", add_val); // wrong val
+#endif
+            // printf ("\nw[%d]=%d\n", num_order, new_remain_alphabet[num_order]);
+            int *cur_array_extended = add_val_to_end_array (in_cur_arr, in_cur_arrSize, add_val);
+            // free (in_cur_arr);
+            if (NULL != cur_array_extended) {
+                // part of the solution allocated
+                int *redused_alphabet = remove_int_from_arr (new_remain_alphabet, size_of_alphabet, num_order);
+                if (redused_alphabet != new_remain_alphabet) {
+                    // printf ("\n remove array val error");
+                }
+                if (NULL != redused_alphabet) {
+                    assemble_from_alph (redused_alphabet, (size_of_alphabet - 1), cur_array_extended,
+                                        in_cur_arrSize + 1, solution_array);
+                    // free (redused_alphabet);
+                } else {
+                    assemble_from_alph (NULL, 0, cur_array_extended, in_cur_arrSize + 1, solution_array);
+                }
+            } else {
+                printf ("\n Unable to add val to end %u", num_order);
+            }
+            if (new_remain_alphabet) {
+                free (new_remain_alphabet);
+            }
+        }
+        // if (in_remain_alphabet) {
+        //    free (in_remain_alphabet);
+        //}
+#if DEBUG_PERMUT
+        printf ("\n");
+#endif
+    } else {
+        printf ("\n strange error");
+    }
+}
+
+
+
+
+int **permute (int *array, int numsSize, int *returnSize, int **returnColumnSizes) {
+    // printf ("\n[d] %s(): line %u", __FUNCTION__, __LINE__);
+    int amount_of_comb = factorial (numsSize);
+    (*returnSize) = amount_of_comb;
+#ifdef DEBUG_PERMUT
+    printf ("\n[d]amount_of_comb %u", amount_of_comb);
+    int size_for_sol = amount_of_comb*numsSize * sizeof(int);
+    printf ("\n[d]size_for_sol %u", size_for_sol);
+#endif
+    int **solution;
+    solution = (int **)malloc (sizeof (int *) * amount_of_comb);
+    assemble_from_alph (array, numsSize, NULL, 0, solution);
+
+    int *columnSizes = (int *)malloc (sizeof (int) * amount_of_comb);
+    for (int i = 0; i < amount_of_comb; i++) {
+        columnSizes[i] = numsSize;
+    }
+    *returnColumnSizes = columnSizes;
+
+    return solution;
 }
