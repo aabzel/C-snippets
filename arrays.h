@@ -37,6 +37,6 @@ bool test_single_number (void);
 
 #ifdef __cplusplus
 }
-#endif
+#endif 
 
 #endif /* __ARRAYS_H */
