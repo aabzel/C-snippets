@@ -84,3 +84,61 @@ uint64_t swap_bits(uint64_t in_val) {
 }
 
 
+
+int swap_dec (int in_x) {
+    int64_t rev_dec = 0;
+    int64_t x = (int64_t)in_x;
+#ifdef DEBUG
+    printf ("\nx=%d", x);
+#endif
+    int sign = 1;
+    if (0 == x) {
+        return 0;
+    }
+    if (x < 0) {
+        x = -x;
+        sign = -1;
+    }
+    uint8_t arr[13];
+    memset (arr, 0xFF, sizeof (arr));
+    int cnt = 0;
+    uint8_t digit = 0;
+    while (0 < x) {
+        digit = x % 10;
+#ifdef DEBUG
+        printf ("\n[%d]=%d ", cnt, digit);
+#endif
+        arr[cnt] = digit;
+        x = x / 10;
+        cnt++;
+    }
+#ifdef DEBUG
+    printf ("\n");
+#endif
+    // cnt - rank of x
+    int rank = cnt - 1;
+    if (0 <= rank) {
+        rev_dec = 0;
+        for (int i = (rank); 0 <= i; i--) {
+            int64_t power = powi (10, (rank - i));
+            int64_t incriment = ((int64_t)arr[i]) * (int64_t)power;
+#ifdef DEBUG
+            printf ("\narr[%d]=%d power %I64d %I64d", i, arr[i], power, incriment);
+#endif
+            rev_dec += incriment;
+        }
+    }
+#ifdef DEBUG
+    printf ("\nrev_dec=%I64d", rev_dec);
+#endif
+    if (2147483647 < rev_dec) {
+        rev_dec = 0;
+    }
+#ifdef DEBUG
+    printf ("\nlim rev_dec=%I64d", rev_dec);
+#endif
+    rev_dec = rev_dec * sign;
+    return rev_dec;
+}
+
+
