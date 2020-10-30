@@ -14,6 +14,7 @@ bool is_power_of_two (uint32_t const val);
 bool is_parity_odd (uint32_t const inVal);
 uint8_t count_set_bits (uint32_t const inVal32bit);
 uint64_t swap_bits (uint64_t in_val);
+int swap_dec (int in_x);
   
 #ifdef __cplusplus
 }
